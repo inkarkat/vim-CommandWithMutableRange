@@ -25,15 +25,48 @@ if exists('g:loaded_CommandWithMutableRange') || (v:version < 700)
 endif
 let g:loaded_CommandWithMutableRange = 1
 
-function! s:SetMarks( currentLine, endLine )
-    let l:marks = [ [a:currentLine, 'u'], [a:currentLine + 1, 'v'], [a:endLine, 'w'] ]
+if ! exists('g:CommandWithMutableRange_marks')
+    let g:CommandWithMutableRange_marks = ''
+endif
+
+function! s:FindUnusedMark()
+    for l:mark in split('abcdefghijklmnopqrstuvwxyz', '\zs')
+	if getpos("'" . l:mark) == [0, 0, 0, 0]
+	    " Reserve mark so that the next invocation doesn't return it again. 
+	    execute 'normal! m' . l:mark
+	    return l:mark
+	endif
+    endfor
+    throw 'CommandWithMutableRange: Ran out of unused marks!'
+endfunction
+function! s:ReserveMarks()
+    let l:marksRecord = {}
+    for l:cnt in range(0,2)
+	let l:mark = strpart(g:CommandWithMutableRange_marks, l:cnt, 1)
+	if empty(l:mark)
+	    let l:unusedMark = s:FindUnusedMark()
+	    let l:marksRecord[l:unusedMark] = [0, 0, 0, 0]
+	else
+	    let l:marksRecord[l:mark] = getpos("'" . l:mark)
+	endif
+    endfor
+    return l:marksRecord
+endfunction
+function! s:UnreserveMarks( marksRecord )
+    for l:mark in keys(a:marksRecord)
+	call setpos("'" . l:mark, a:marksRecord[l:mark])
+    endfor
+endfunction
+function! s:SetMarks( reservedMarks, currentLine, endLine )
+    let l:marks = [ [a:currentLine, a:reservedMarks[0]], [a:currentLine + 1, a:reservedMarks[1]], [a:endLine, a:reservedMarks[2]] ]
     for [l:lineNumber, l:mark] in l:marks
-	if setpos("'" . l:mark, [0, l:lineNumber, 1, 0]) !=0
-	    throw 'badmark'
+	if setpos("'" . l:mark, [0, l:lineNumber, 1, 0]) != 0
+	    throw 'CommandWithMutableRange: Panic: Couldn''t set mark!'
 	endif
     endfor
     return l:marks
 endfunction
+
 function! s:IsValid( markLineNum )
     return (a:markLineNum > 0)
 endfunction
@@ -132,13 +165,15 @@ function! s:CommandWithMutableRange( commandType, startLine, endLine, commandStr
     " command would open a closed fold, anyway. (Unfortunately, there's no ex
     " command to jump to a first column of a line (that leaves folding intact).)
     let l:save_foldenable = &foldenable
+    let l:reservedMarksRecord = {}
     try
 	setlocal nofoldenable
+	let l:reservedMarksRecord = s:ReserveMarks()
 
 	let l:line = a:startLine
 	let l:endLine = a:endLine
 	while l:line <= l:endLine
-	    let l:marks = s:SetMarks(l:line, l:endLine)
+	    let l:marks = s:SetMarks(keys(l:reservedMarksRecord), l:line, l:endLine)
 
 	    execute l:line
 	    normal! 0
@@ -149,7 +184,8 @@ function! s:CommandWithMutableRange( commandType, startLine, endLine, commandStr
 		echohl ErrorMsg
 		" v:exception contains what is normally in v:errmsg, but with extra
 		" exception source info prepended, which we cut away. 
-		echomsg substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+		let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+		echomsg v:errmsg
 		echohl NONE
 	    endtry
 	    let [l:line, l:endLine, l:debug] = s:EvaluateMarks(l:marks)
@@ -157,9 +193,11 @@ function! s:CommandWithMutableRange( commandType, startLine, endLine, commandStr
 	endwhile
     catch /^CommandWithMutableRange:/
 	echohl ErrorMsg
-	echomsg substitute(v:exception, '^CommandWithMutableRange:\s*', '', '')
+	let v:errmsg = substitute(v:exception, '^CommandWithMutableRange:\s*', '', '')
+	echomsg v:errmsg
 	echohl None
     finally
+	call s:UnreserveMarks(l:reservedMarksRecord)
 	let &foldenable = l:save_foldenable
     endtry
 endfunction
