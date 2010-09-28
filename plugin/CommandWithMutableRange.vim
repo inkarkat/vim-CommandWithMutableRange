@@ -7,7 +7,7 @@
 "   modifies the number of lines in the buffer, the iteration continues over the
 "   initially supplied range of line numbers, totally oblivious to the changes.
 "   Thus, if you want to apply modifications that add or delete lines before or
-"   inside the [range], this built-in VIM functionality isn't much of a help.
+"   inside the [range], this built-in Vim functionality isn't much of a help.
 "   (You can work around this by recording a macro and then repeating it over
 "   each line.)  
 "   This script offers enhanced versions of the :[range]normal[!] and
@@ -46,10 +46,12 @@
 "   help avoid this situation. 
 "
 " INSTALLATION:
-"   Put the script into your user or system VIM plugin directory (e.g.
+"   Put the script into your user or system Vim plugin directory (e.g.
 "   ~/.vim/plugin). 
 "
 " DEPENDENCIES:
+"   - ingomarks.vim autoload script. 
+"
 " CONFIGURATION:
 "   By default, the commands try to find 3 unused marks in the current buffer,
 "   and will refuse to work if no unused marks can be found. 
@@ -94,15 +96,17 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2009 by Ingo Karkat
+" Copyright: (C) 2009-2010 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	002	29-Sep-2010	Split off reserving of marks to ingomarks.vim
+"				autoload plugin to allow reuse. 
 "	001	10-Jan-2009	file creation
 
-" Avoid installing twice or when in unsupported VIM version. 
+" Avoid installing twice or when in unsupported Vim version. 
 if exists('g:loaded_CommandWithMutableRange') || (v:version < 700)
     finish
 endif
@@ -112,34 +116,6 @@ if ! exists('g:CommandWithMutableRange_marks')
     let g:CommandWithMutableRange_marks = ''
 endif
 
-function! s:FindUnusedMark()
-    for l:mark in split('abcdefghijklmnopqrstuvwxyz', '\zs')
-	if getpos("'" . l:mark) == [0, 0, 0, 0]
-	    " Reserve mark so that the next invocation doesn't return it again. 
-	    execute 'normal! m' . l:mark
-	    return l:mark
-	endif
-    endfor
-    throw 'CommandWithMutableRange: Ran out of unused marks!'
-endfunction
-function! s:ReserveMarks()
-    let l:marksRecord = {}
-    for l:cnt in range(0,2)
-	let l:mark = strpart(g:CommandWithMutableRange_marks, l:cnt, 1)
-	if empty(l:mark)
-	    let l:unusedMark = s:FindUnusedMark()
-	    let l:marksRecord[l:unusedMark] = [0, 0, 0, 0]
-	else
-	    let l:marksRecord[l:mark] = getpos("'" . l:mark)
-	endif
-    endfor
-    return l:marksRecord
-endfunction
-function! s:UnreserveMarks( marksRecord )
-    for l:mark in keys(a:marksRecord)
-	call setpos("'" . l:mark, a:marksRecord[l:mark])
-    endfor
-endfunction
 function! s:SetMarks( reservedMarks, currentLine, endLine )
     let l:marks = [ [a:currentLine, a:reservedMarks[0]], [a:currentLine + 1, a:reservedMarks[1]], [a:endLine, a:reservedMarks[2]] ]
     for [l:lineNumber, l:mark] in l:marks
@@ -251,7 +227,7 @@ function! s:CommandWithMutableRange( commandType, startLine, endLine, commandStr
     let l:reservedMarksRecord = {}
     try
 	setlocal nofoldenable
-	let l:reservedMarksRecord = s:ReserveMarks()
+	let l:reservedMarksRecord = ingomarks#ReserveMarks(3, g:CommandWithMutableRange_marks)
 
 	let l:line = a:startLine
 	let l:endLine = a:endLine
@@ -274,13 +250,18 @@ function! s:CommandWithMutableRange( commandType, startLine, endLine, commandStr
 	    let [l:line, l:endLine, l:debug] = s:EvaluateMarks(l:marks)
 "****D echomsg '****' l:debug . ' => ' . l:line . ' ' . l:endLine
 	endwhile
+    catch /^ingomarks:/
+	echohl ErrorMsg
+	let v:errmsg = substitute(v:exception, '^ingomarks:\s*', '', '')
+	echomsg v:errmsg
+	echohl None
     catch /^CommandWithMutableRange:/
 	echohl ErrorMsg
 	let v:errmsg = substitute(v:exception, '^CommandWithMutableRange:\s*', '', '')
 	echomsg v:errmsg
 	echohl None
     finally
-	call s:UnreserveMarks(l:reservedMarksRecord)
+	call ingomarks#UnreserveMarks(l:reservedMarksRecord)
 	let &foldenable = l:save_foldenable
     endtry
 endfunction
