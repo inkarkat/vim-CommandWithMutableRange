@@ -1,4 +1,4 @@
-*CommandWithMutableRange.txt*	Execute commands which may add or remove lines for each line in the range. 
+*CommandWithMutableRange.txt*	Execute commands which may add or remove lines for each line in the range.
 
 		 COMMAND WITH MUTABLE RANGE    by Ingo Karkat
 						 *CommandWithMutableRange.vim*
@@ -17,7 +17,7 @@ DESCRIPTION				 *CommandWithMutableRange-description*
 
 This plugin offers enhanced versions of the :[range]normal[!] and :[range]call
 commands which allow for additions and deletions of lines during iteration,
-and adapt the initially supplied [range] accordingly. 
+and adapt the initially supplied [range] accordingly.
 
 The built-in |:normal|[!] and |:call| commands can take a [range], and are then
 executed for each line in the range. If the supplied command / function
@@ -27,7 +27,7 @@ Thus, if you want to apply modifications that add or delete lines before or
 inside the [range], this built-in Vim functionality isn't much of a help. (You
 can work around this by recording a macro and then manually repeating it over
 each line, until you reach the end of the range, but you need to do the
-checking.)  
+checking.)
 
 HOW IT WORKS								     *
 
@@ -39,7 +39,7 @@ iteration. But even if one or multiple marks have been removed by the command
 figured out by inspecting how the remaining marks have moved. The
 ...WithMutableRange commands will abort with an error if they lost track and
 cannot continue with the iteration; see |CommandWithMutableRange-integration|
-below on how you can help avoid this situation. 
+below on how you can help avoid this situation.
 
 RELATED WORKS								     *
 
@@ -50,33 +50,33 @@ RELATED WORKS								     *
 USAGE					       *CommandWithMutableRange-usage*
 
 The plugin provides enhanced versions of the |:call|, |:normal| and |:execute|
-Vim commands: 
+Vim commands:
 						     *:CallWithMutableRange()*
 :[range]CallWithMutableRange {name}([arguments])
 			Call a function (that does not need to accept a range)
-			once for every line in [range]. 
+			once for every line in [range].
 
 						   *:NormalWithMutableRange()*
 :[range]NormalWithMutableRange[!] {commands}
 			Execute Normal mode commands {commands} for each line
-			in the [range]. 
+			in the [range].
 
 						  *:ExecuteWithMutableRange()*
 :[range]ExecuteWithMutableRange {expr1} ...
 			Execute the string that results from the evaluation of
 			{expr1} as an Ex command, once for every line in
-			[range]. {expr1} is re-evaluated on each line. 
+			[range]. {expr1} is re-evaluated on each line.
 			Normally, (custom) commands that can operate over
 			multiple lines should take an optional [range], but
 			sometimes this wasn't implemented, and the command
 			only operates on the current position. In these cases,
 			(in addition to ad-hoc expressions) this command is
 			useful, and also handles (most) deletions and
-			insertions gracefully. 
+			insertions gracefully.
 
 For each iteration, the cursor is positioned in the first column of that line.
 Folding is temporarily disabled. The cursor is left at the last line (possibly
-moved by the last invocation). The arguments are re-evaluated for each line. 
+moved by the last invocation). The arguments are re-evaluated for each line.
 
 ==============================================================================
 INSTALLATION				*CommandWithMutableRange-installation*
@@ -87,11 +87,11 @@ the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
 vimball or via the |:UseVimball| command. >
     vim CommandWithMutableRange.vba.gz
     :so %
-To uninstall, use the |:RmVimball| command. 
+To uninstall, use the |:RmVimball| command.
 
 DEPENDENCIES				*CommandWithMutableRange-dependencies*
 
-- Requires Vim 7.0 or higher. 
+- Requires Vim 7.0 or higher.
 
 ==============================================================================
 CONFIGURATION			       *CommandWithMutableRange-configuration*
@@ -108,16 +108,16 @@ The existing mark positions will still be saved and restored (but only to
 their pre-iteration line numbers, not adapted to the modifications!), but you
 really shouldn't use these marks inside the commands executed by the
 ...WithMutableRange commands. (Except for helping our command to keep track of
-the next line, see |CommandWithMutableRange-integration| below.) 
+the next line, see |CommandWithMutableRange-integration| below.)
 
 ==============================================================================
 INTEGRATION				 *CommandWithMutableRange-integration*
 
 This section describes what your commands / functions executed by the
-...WithMutableRange command should and shouldn't do in order to succeed. 
+...WithMutableRange command should and shouldn't do in order to succeed.
 
 - You do not need to restore the cursor position or move back to the current
-  line, this is taken care of automatically. 
+  line, this is taken care of automatically.
 
 - Deleting lines removes the line's marks; joining lines together moves marks,
   etc. Try to keep the marks on the current and next line intact. For example,
@@ -128,7 +128,7 @@ This section describes what your commands / functions executed by the
     :NormalWithMutableRange! Ovv^[jo^^
 < which keeps all marks intact.
   (Though in this simple case, our commands can recover from the lost mark
-  because the next line is left untouched.) 
+  because the next line is left untouched.)
 
 - If the commands cannot continue with the iteration, you can help by
   re-setting any deleted marks yourself. First, you need to avoid that
@@ -136,10 +136,10 @@ This section describes what your commands / functions executed by the
     :let g:CommandWithMutableRange_marks = 'uvw'
 < Then, re-set any deleted mark inside your command / function. (In this
   example, the "current line" mark (u) is restored:) >
-    :ExecuteWithMutableRange if getline('.') =~ 'Heading' | 
+    :ExecuteWithMutableRange if getline('.') =~ 'Heading' |
     \   execute 'normal! 2ddOHHH' | execute 'normal! mu' | endif
 < (Don't forget to reset g:CommandWithMutableRange_marks to its previous
-  contents (default is '', don't :unset the variable!)) 
+  contents (default is '', don't :unset the variable!))
 
 ==============================================================================
 LIMITATIONS				 *CommandWithMutableRange-limitations*
@@ -154,14 +154,14 @@ IDEAS					       *CommandWithMutableRange-ideas*
 HISTORY					     *CommandWithMutableRange-history*
 
 1.00	07-Oct-2010
-First published version. 
+First published version.
 
 0.01	10-Jan-2009
-Started development. 
+Started development.
 
 ==============================================================================
 Copyright: (C) 2009-2010 Ingo Karkat
-The VIM LICENSE applies to this script; see |copyright|. 
+The VIM LICENSE applies to this plugin see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
 ==============================================================================
