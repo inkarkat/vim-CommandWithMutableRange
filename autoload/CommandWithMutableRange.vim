@@ -2,14 +2,16 @@
 " for each line in the range.
 "
 " DEPENDENCIES:
-"   - ingomarks.vim autoload script.
+"   - ingo/msg.vim autoload script
+"   - ingomarks.vim autoload script
 "
-" Copyright: (C) 2010 Ingo Karkat
+" Copyright: (C) 2010-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.002	14-Jun-2013	Use ingo/msg.vim.
 "   1.00.001	29-Sep-2010	Moved functions from plugin to separate autoload
 "				script.
 "				file creation
@@ -138,26 +140,15 @@ function! CommandWithMutableRange#CommandWithMutableRange( commandType, startLin
 "****D echomsg '****' l:line . ' ' . getline(l:line)
 		execute a:commandType . ' ' . a:commandString
 	    catch /^Vim\%((\a\+)\)\=:E/
-		echohl ErrorMsg
-		" v:exception contains what is normally in v:errmsg, but with extra
-		" exception source info prepended, which we cut away.
-		let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
-		echomsg v:errmsg
-		echohl None
+		call ingo#msg#VimExceptionMsg()
 	    endtry
 	    let [l:line, l:endLine, l:debug] = s:EvaluateMarks(l:marks)
 "****D echomsg '****' l:debug . ' => ' . l:line . ' ' . l:endLine
 	endwhile
     catch /^ingomarks:/
-	echohl ErrorMsg
-	let v:errmsg = substitute(v:exception, '^ingomarks:\s*', '', '')
-	echomsg v:errmsg
-	echohl None
+	call ingo#msg#CustomExceptionMsg('ingomarks')
     catch /^CommandWithMutableRange:/
-	echohl ErrorMsg
-	let v:errmsg = substitute(v:exception, '^CommandWithMutableRange:\s*', '', '')
-	echomsg v:errmsg
-	echohl None
+	call ingo#msg#CustomExceptionMsg('CommandWithMutableRange')
     finally
 	call ingomarks#UnreserveMarks(l:reservedMarksRecord)
 	let &foldenable = l:save_foldenable
