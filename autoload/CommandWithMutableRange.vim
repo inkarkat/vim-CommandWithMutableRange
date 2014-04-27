@@ -3,7 +3,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
-"   - ingomarks.vim autoload script
+"   - ingo/plugin/marks.vim autoload script
 "
 " Copyright: (C) 2010-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.003	08-Jul-2013	Move ingomarks.vim into ingo-library.
 "   1.01.002	14-Jun-2013	Use ingo/msg.vim.
 "   1.00.001	29-Sep-2010	Moved functions from plugin to separate autoload
 "				script.
@@ -127,7 +128,7 @@ function! CommandWithMutableRange#CommandWithMutableRange( commandType, startLin
     let l:reservedMarksRecord = {}
     try
 	setlocal nofoldenable
-	let l:reservedMarksRecord = ingomarks#ReserveMarks(3, g:CommandWithMutableRange_marks)
+	let l:reservedMarksRecord = ingo#plugin#marks#Reserve(3, g:CommandWithMutableRange_marks)
 
 	let l:line = a:startLine
 	let l:endLine = a:endLine
@@ -145,12 +146,12 @@ function! CommandWithMutableRange#CommandWithMutableRange( commandType, startLin
 	    let [l:line, l:endLine, l:debug] = s:EvaluateMarks(l:marks)
 "****D echomsg '****' l:debug . ' => ' . l:line . ' ' . l:endLine
 	endwhile
-    catch /^ingomarks:/
-	call ingo#msg#CustomExceptionMsg('ingomarks')
+    catch /^ReserveMarks:/
+	call ingo#msg#CustomExceptionMsg('ReserveMarks')
     catch /^CommandWithMutableRange:/
 	call ingo#msg#CustomExceptionMsg('CommandWithMutableRange')
     finally
-	call ingomarks#UnreserveMarks(l:reservedMarksRecord)
+	call ingo#plugin#marks#Unreserve(l:reservedMarksRecord)
 	let &foldenable = l:save_foldenable
     endtry
 endfunction
