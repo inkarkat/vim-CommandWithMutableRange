@@ -5,7 +5,7 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/plugin/marks.vim autoload script
 "
-" Copyright: (C) 2010-2013 Ingo Karkat
+" Copyright: (C) 2010-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -140,7 +140,7 @@ function! CommandWithMutableRange#CommandWithMutableRange( commandType, startLin
 	    try
 "****D echomsg '****' l:line . ' ' . getline(l:line)
 		execute a:commandType . ' ' . a:commandString
-	    catch /^Vim\%((\a\+)\)\=:E/
+	    catch /^Vim\%((\a\+)\)\=:/
 		call ingo#msg#VimExceptionMsg()
 	    endtry
 	    let [l:line, l:endLine, l:debug] = s:EvaluateMarks(l:marks)
