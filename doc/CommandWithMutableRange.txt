@@ -51,17 +51,17 @@ USAGE					       *CommandWithMutableRange-usage*
 
 The plugin provides enhanced versions of the |:call|, |:normal| and |:execute|
 Vim commands:
-						     *:CallWithMutableRange()*
+						       *:CallWithMutableRange*
 :[range]CallWithMutableRange {name}([arguments])
 			Call a function (that does not need to accept a range)
 			once for every line in [range].
 
-						   *:NormalWithMutableRange()*
+						     *:NormalWithMutableRange*
 :[range]NormalWithMutableRange[!] {commands}
 			Execute Normal mode commands {commands} for each line
 			in the [range].
 
-						  *:ExecuteWithMutableRange()*
+						    *:ExecuteWithMutableRange*
 :[range]ExecuteWithMutableRange {expr1} ...
 			Execute the string that results from the evaluation of
 			{expr1} as an Ex command, once for every line in
@@ -165,7 +165,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2009-2013 Ingo Karkat
+Copyright: (C) 2009-2017 Ingo Karkat
 The VIM LICENSE applies to this plugin see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
