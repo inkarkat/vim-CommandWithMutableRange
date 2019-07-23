@@ -34,4 +34,4 @@ command! -range -nargs=1 ExecuteWithMutableRange	call CommandWithMutableRange#Co
 command! -range -nargs=1 CallWithMutableRange		call CommandWithMutableRange#CommandWithMutableRange('call', <line1>, <line2>, <q-args>)
 command! -range -nargs=1 -bang NormalWithMutableRange	call CommandWithMutableRange#CommandWithMutableRange('normal<bang>', <line1>, <line2>, <q-args>)
 
-" vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
+" vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
