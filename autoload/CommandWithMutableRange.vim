@@ -1,16 +1,16 @@
-" CommandWithMutableRange.vim: Execute commands which may add or remove lines
-" for each line in the range.
+" CommandWithMutableRange.vim: Execute commands which may add or remove lines for each line in the range.
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
 "   - ingo/plugin/marks.vim autoload script
 "
-" Copyright: (C) 2010-2014 Ingo Karkat
+" Copyright: (C) 2010-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.004	01-Apr-2019	Use ingo#pos#Make4().
 "   1.01.003	08-Jul-2013	Move ingomarks.vim into ingo-library.
 "   1.01.002	14-Jun-2013	Use ingo/msg.vim.
 "   1.00.001	29-Sep-2010	Moved functions from plugin to separate autoload
@@ -20,7 +20,7 @@
 function! s:SetMarks( reservedMarks, currentLine, endLine )
     let l:marks = [ [a:currentLine, a:reservedMarks[0]], [a:currentLine + 1, a:reservedMarks[1]], [a:endLine, a:reservedMarks[2]] ]
     for [l:lineNumber, l:mark] in l:marks
-	if setpos("'" . l:mark, [0, l:lineNumber, 1, 0]) != 0
+	if setpos("'" . l:mark, ingo#pos#Make4(l:lineNumber, 1)) != 0
 	    throw 'CommandWithMutableRange: Panic: Couldn''t set mark!'
 	endif
     endfor
