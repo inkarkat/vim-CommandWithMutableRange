@@ -1,2 +1,3 @@
-runtime plugin/CommandWithMutableRange.vim
+call vimtest#AddDependency('vim-ingo-library')
 
+runtime plugin/CommandWithMutableRange.vim
