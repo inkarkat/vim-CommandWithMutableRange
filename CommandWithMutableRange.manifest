@@ -1,4 +1,3 @@
-autoload/ingomarks.vim
 autoload/CommandWithMutableRange.vim
 plugin/CommandWithMutableRange.vim
 doc/CommandWithMutableRange.txt
