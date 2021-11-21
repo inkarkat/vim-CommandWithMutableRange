@@ -92,7 +92,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES				*CommandWithMutableRange-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.010 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.037 or
   higher.
 
 ==============================================================================
@@ -165,7 +165,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2009-2017 Ingo Karkat
+Copyright: (C) 2009-2019 Ingo Karkat
 The VIM LICENSE applies to this plugin see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
